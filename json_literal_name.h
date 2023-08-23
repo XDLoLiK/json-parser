@@ -1,0 +1,4 @@
+#ifndef JSON_LITERAL_NAME_H
+#define JSON_LITERAL_NAME_H
+
+#endif // JSON_LITERAL_NAME_H
