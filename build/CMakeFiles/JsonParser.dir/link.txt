@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/JsonParser.dir/json_array.c.o CMakeFiles/JsonParser.dir/json_object.c.o CMakeFiles/JsonParser.dir/json_value.c.o CMakeFiles/JsonParser.dir/main.c.o -o JsonParser 
