@@ -1,3 +1,0 @@
-/home/stanislav/json_parser/build/CMakeFiles/JsonParser.dir
-/home/stanislav/json_parser/build/CMakeFiles/edit_cache.dir
-/home/stanislav/json_parser/build/CMakeFiles/rebuild_cache.dir
