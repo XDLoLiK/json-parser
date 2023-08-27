@@ -5,22 +5,58 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "json_array.h"
-#include "json_object.h"
-#include "json_value.h"
+/**
+ * @brief 
+ * 
+ */
+enum JsonParserErrorCodes {
+    NoError,
+    ParserErrorCodeMax,
+};
 
-#define JSON_PARSER_BUFFER_SIZE 4096
+/**
+ * @brief 
+ * 
+ */
+struct JsonParserError {
+    enum JsonParserErrorCodes error_code;
+    const char *error_message;
+};
 
+/**
+ * @brief 
+ * 
+ */
 struct JsonParser {
     const char *file_name;
     FILE *file;
-    const char *current_line;
+    const char *line_start;
+    char *line_current;
     size_t line;
     size_t column;
 };
 
+/**
+ * @brief 
+ * 
+ * @param json_file_name 
+ * @return struct JsonParser* 
+ */
 struct JsonParser *json_parser_new(const char *json_file_name);
-struct JsonValue *json_parser_get_value(struct JsonParser *json_parser);
+
+/**
+ * @brief 
+ * 
+ * @param json_parser 
+ */
 void json_parser_delete(struct JsonParser *json_parser);
+
+/**
+ * @brief 
+ * 
+ * @param json_parser 
+ * @return struct JsonValue* 
+ */
+struct JsonValue *json_parser_get_value(struct JsonParser *json_parser);
 
 #endif // JSON_PARSER_H

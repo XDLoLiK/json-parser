@@ -1,10 +1,7 @@
+#include "json_array.h"
+#include "json_object.h"
 #include "json_parser.h"
-
-const char *LITERAL_NAMES[] = {
-    "false",
-    "null",
-    "true",
-};
+#include "json_value.h"
 
 struct JsonParser *json_parser_new(const char *json_file_name) {
     struct JsonParser *json_parser = calloc(1, sizeof(struct JsonParser));
@@ -27,74 +24,81 @@ struct JsonParser *json_parser_new(const char *json_file_name) {
         return NULL;
     }
 
-    json_parser->current_line = calloc(JSON_PARSER_BUFFER_SIZE, sizeof(char));
+    bump_line(json_parser);
 
-    if (!json_parser->buffer) {
+    if (!json_parser->line_start) {
         json_parser_delete(json_parser);
         return NULL;
     }
 
-    json_parser->line = 0;
-    json_parser->column = 0;
     return json_parser;
 }
 
-static void json_parser_bump_buffer(struct JsonParser *json_parser) {
-    if (*json_parser->current != '\0') {
-        return;
-    }
-
-    size_t buffer_size = 0;
-    size_t line_size = 0;
-
-    while (buffer_size < JSON_PARSER_BUFFER_SIZE) {
-        fscanf(json_parser->file, "%`[^\n]%*c%n", buffer, &line_size);
-        buffer_size += line_size;
-    }
-}
-
 void json_parser_delete(struct JsonParser *json_parser) {
-    // TODO: poison struct data
     free(json_parser->file_name);
+    json_parser->file_name = NULL;
 
     if (json_parser->file) {
         fclose(json_parser->file);
     }
 
-    free(json_parser->buffer);
+    json_parser->file = NULL;
+    free(json_parser->line_start);
+    json_parser->line_start = NULL;
+    json_parser->line_current = NULL;
+    json_parser->line = 0;
+    json_parser->column = 0;
     free(json_parser);
 }
 
-static struct JsonValue parse_value(struct JsonParser *json_parser) {
-    struct JsonValue json_value = {
-        .value_type = ValueTypeMax,
-    };
+struct JsonValue *json_parser_get_value(struct JsonParser *json_parser) {
+    return parse_value(json_parser);
+}
 
-    if (isdigit(json_parser->buffer)) {
-        json_value.value_type = Number;
-        json_value.number = parse_number(json);
+static void bump_line(struct JsonParser *json_parser) {
+    char *line = NULL;
+    fscanf(json_parser->file, "%m[^\n]\n", &line);
+    free(json_parser->line_start);
+    free(json_parser->line_current);
+    json_parser->line_start = line;
+    json_parser->line_current = strdup(line);
+    json_parser->line++;
+    json_parser->column = 0;
+}
+
+static void report_error(struct JsonParser *json_parser) {
+    void(json_parser);
+}
+
+static struct JsonValue *parse_value(struct JsonParser *json_parser) {
+    struct JsonValue json_value = json_value_new();
+    json_value->type = ValueTypeMax;
+
+    if (isdigit(json_parser->line_current)) {
+        json_value->value_type = Number;
+        json_value->number = parse_number(json_parser);
         return json_value;
     }
 
-    switch (*json_parser->buffer) {
+    switch (*json_parser->line_current) {
         case '{': {
-            json_value.value_type = Object;
-            json_value.object = parse_object(json + 1);
+            json_value->value_type = Object;
+            json_value->object = parse_object(json_parser);
             break;
         }
         case '[': {
-            json_value.value_type = Array;
-            json_value.object = parse_array(json + 1);
+            json_value->value_type = Array;
+            json_value->object = parse_array(json_parser);
             break;
         }
         case '\"': {
-            json_value.value_type = String;
-            json_value.string = parse_string(json + 1);
+            json_value->value_type = String;
+            json_value->string = parse_string(json_parser);
             break;
         }
         default: {
-            json_value.value_type = LiteralName;
-            json_value.literal_name = parse_literal_name(json);
+            json_value->value_type = LiteralName;
+            json_value->literal_name = parse_literal_name(json_parser);
             break;
         }
     }
@@ -108,13 +112,13 @@ static double parse_number(struct JsonParser *json_parser) {
     return json_number;
 }
 
-static struct JsonObject parse_object(struct JsonParser *json_parser) {
-    struct JsonObject json_object = {};
+static struct JsonObject *parse_object(struct JsonParser *json_parser) {
+    struct JsonObject json_object = json_object_new();
     return json_object;
 }
 
-static struct JsonArray parse_array(struct JsonParser *json_parser) {
-    struct JsonArray json_array = {};
+static struct JsonArray *parse_array(struct JsonParser *json_parser) {
+    struct JsonArray json_array = json_array_new();
     return json_array;
 }
 
@@ -136,7 +140,9 @@ static const char *parse_string(struct JsonParser *json_parser) {
     return json_string;
 }
 
-static enum JsonLiteralNames parse_literal_name(struct JsonParser *json_parser) {
+static enum JsonLiteralNames parse_literal_name(
+    struct JsonParser *json_parser
+) {
     size_t json_length = strlen(json);
 
     for (int i = 0; i < LiteralNameMax; i++) {
