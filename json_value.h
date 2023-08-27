@@ -4,8 +4,6 @@
 #include <stddef.h>
 #include <stdio.h>
 
-extern const char *LITERAL_NAMES[];
-
 /**
  * @brief 
  * 
@@ -35,12 +33,12 @@ enum JsonValueTypes {
  * 
  */
 struct JsonValue {
-    enum JsonValueTypes type;
+    enum JsonValueTypes value_type;
     union {
         struct JsonObject *object;
         struct JsonArray *array;
         double number;
-        char *string;
+        const char *string;
         enum JsonLiteralNames literal_name;
     };
 };

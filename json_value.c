@@ -14,7 +14,7 @@ struct JsonValue *json_value_new() {
 }
 
 void json_value_delete(struct JsonValue *json_value) {
-    switch (json_value->type) {
+    switch (json_value->value_type) {
         case Object: {
             json_object_delete(json_value->object);
             break;
@@ -24,7 +24,7 @@ void json_value_delete(struct JsonValue *json_value) {
             break;
         }
         case String: {
-            free(json_value->string);
+            free((void *)json_value->string);
             break;
         }
         default: {
@@ -36,11 +36,11 @@ void json_value_delete(struct JsonValue *json_value) {
 }
 
 enum JsonValueTypes json_value_type(struct JsonValue *json_value) {
-    return json_value->type;
+    return json_value->value_type;
 }
 
 void json_value_print(struct JsonValue *json_value, FILE *file) {
-    switch (json_value->type) {
+    switch (json_value->value_type) {
         case Object: {
             json_object_print(json_value->object, file);
             break;

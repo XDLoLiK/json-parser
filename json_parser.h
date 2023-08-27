@@ -11,6 +11,8 @@
  */
 enum JsonParserErrorCodes {
     NoError,
+    StringExpected,
+    LiteralNameExpected,
     ParserErrorCodeMax,
 };
 
@@ -21,6 +23,7 @@ enum JsonParserErrorCodes {
 struct JsonParserError {
     enum JsonParserErrorCodes error_code;
     const char *error_message;
+    void (*error_handler)(void);
 };
 
 /**
@@ -31,7 +34,7 @@ struct JsonParser {
     const char *file_name;
     FILE *file;
     const char *line_start;
-    char *line_current;
+    const char *line_current;
     size_t line;
     size_t column;
 };
