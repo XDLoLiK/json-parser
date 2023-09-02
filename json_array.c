@@ -54,14 +54,15 @@ void json_array_insert(
         json_array->size - position
     );
     memcpy(
-        &json_array->data[json_array->size++],
+        &json_array->data[position],
         value,
         sizeof(struct JsonValue)
     );
+    json_array->size++;
 }
 
 void json_array_erase(struct JsonArray *json_array, size_t position) {
-    position = MIN(json_array->size, position);
+    position = MIN(json_array->size - 1, position);
     memmove(
         &json_array->data[position],
         &json_array->data[position + 1],

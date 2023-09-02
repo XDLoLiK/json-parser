@@ -1,3 +1,13 @@
+/**
+ * @file json_array.h
+ * @author Goriainov Stanislav (stangoryainov@gmail.com)
+ * @brief This file implements JSON array data structure
+ * @version 0.1
+ * @date 2023-08-31
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef JSON_ARRAY_H
 #define JSON_ARRAY_H
 
@@ -5,13 +15,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "json_math.h"
+#include "json_maths.h"
 
 #define JSON_ARRAY_GROW_RATE 2
 
 /**
  * @brief Represents JSON array
- * 
  */
 struct JsonArray {
     struct JsonValue *data;
@@ -37,8 +46,8 @@ void json_array_delete(struct JsonArray *json_array);
  * @brief Inserts a JSON value into a given JSON array
  * 
  * @param json_array JSON array to insert the value into
- * @param value      JSON value to insert
- * @param position   Position to insert to
+ * @param value JSON value to insert
+ * @param position Position to insert to
  */
 void json_array_insert(
     struct JsonArray *json_array,
@@ -50,7 +59,7 @@ void json_array_insert(
  * @brief Erases a JSON value from a given JSON array
  * 
  * @param json_array JSON array to erase the value from
- * @param position   Position to erase from
+ * @param position Position to erase from
  */
 void json_array_erase(struct JsonArray *json_array, size_t position);
 
@@ -58,7 +67,7 @@ void json_array_erase(struct JsonArray *json_array, size_t position);
  * @brief Provides a JSON value at a given position
  * 
  * @param json_array JSON array to get the value from
- * @param position   Position to get the value from
+ * @param position Position to get the value from
  * @return struct JsonValue* Pointer to a corresponding JSON value
  * or NULL in case of failure
  */
@@ -68,7 +77,7 @@ struct JsonValue *json_array_at(struct JsonArray *json_array, size_t position);
  * @brief Provides the size of a given JSON array
  * 
  * @param json_array JSON array to get the size of
- * @return size_t    The size of a given JSON array
+ * @return size_t The size of a given JSON array
  */
 size_t json_array_size(struct JsonArray *json_array);
 
@@ -76,7 +85,7 @@ size_t json_array_size(struct JsonArray *json_array);
  * @brief Provides the capacity of a given JSON array
  * 
  * @param json_array JSON array to get the capacity of
- * @return size_t    The capacity of a given JSON array
+ * @return size_t The capacity of a given JSON array
  */
 size_t json_array_capacity(struct JsonArray *json_array);
 
@@ -84,7 +93,7 @@ size_t json_array_capacity(struct JsonArray *json_array);
  * @brief Prints a JSON array in a JSON format
  * 
  * @param json_array JSON array to print
- * @param file       File to print the JSON array into
+ * @param file File to print the JSON array into
  */
 void json_array_print(struct JsonArray *json_array, FILE *file);
 
