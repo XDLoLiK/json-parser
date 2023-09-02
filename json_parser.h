@@ -1,34 +1,53 @@
+/**
+ * @file json_parser.h
+ * @author Goriainov Stanislav (stangoryainov@gmail.com)
+ * @brief This file implements JSON parser itself
+ * @version 0.1
+ * @date 2023-09-02
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef JSON_PARSER_H
 #define JSON_PARSER_H
 
 #include <ctype.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
+
+#define JSON_ASSERT(expr)                               \
+do {                                                    \
+    if (!(expr)) {                                      \
+        error_report(json_parser, LibraryInternal);     \
+    }                                                   \
+} while (0)
 
 /**
  * @brief 
- * 
  */
 enum JsonParserErrorCodes {
     NoError,
-    StringExpected,
+    MissingDoubleQuotes,
     LiteralNameExpected,
+    CommentExpected,
+    LibraryInternal,
+    MissingCurlyBraces,
+    MissingSquareBraces,
     ParserErrorCodeMax,
 };
 
 /**
  * @brief 
- * 
  */
 struct JsonParserError {
-    enum JsonParserErrorCodes error_code;
-    const char *error_message;
-    void (*error_handler)(void);
+    enum JsonParserErrorCodes code;
+    const char *message;
+    void (*handler)(void);
 };
 
 /**
  * @brief 
- * 
  */
 struct JsonParser {
     const char *file_name;
