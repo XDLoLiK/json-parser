@@ -14,7 +14,8 @@ set(SOURCES
 
 set(HEADERS
     json_array.h
-    json_math.h
+    json_colours.h
+    json_maths.h
     json_object.h
     json_parser.h
     json_value.h
