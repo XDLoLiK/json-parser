@@ -1,3 +1,13 @@
+/**
+ * @file json_colours.h
+ * @author Goriainov Stanislav (stangoryainov@gmail.com)
+ * @brief This file describes colours for better terminal output
+ * @version 0.1
+ * @date 2023-09-02
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef JSON_COLOURS_H
 #define JSON_COLOURS_H
 

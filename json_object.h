@@ -1,3 +1,13 @@
+/**
+ * @file json_object.h
+ * @author Goriainov Stanislav (stangoryainov@gmail.com)
+ * @brief This file implements JSON object data structure
+ * @version 0.1
+ * @date 2023-09-02
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef JSON_OBJECT_H
 #define JSON_OBJECT_H
 
@@ -6,7 +16,6 @@
 
 /**
  * @brief 
- * 
  */
 struct JsonObjectEntry {
     const char *key;
@@ -15,7 +24,6 @@ struct JsonObjectEntry {
 
 /**
  * @brief 
- * 
  */
 struct JsonObject {
     struct JsonObjectEntry **data;

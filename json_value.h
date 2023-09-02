@@ -1,3 +1,13 @@
+/**
+ * @file json_value.h
+ * @author Goriainov Stanislav (stangoryainov@gmail.com)
+ * @brief This file implements JSON object value structure
+ * @version 0.1
+ * @date 2023-09-02
+ * 
+ * @copyright Copyright (c) 2023
+ */
+
 #ifndef JSON_VALUE_H
 #define JSON_VALUE_H
 
@@ -6,7 +16,6 @@
 
 /**
  * @brief 
- * 
  */
 enum JsonLiteralNames {
     False,
@@ -17,7 +26,6 @@ enum JsonLiteralNames {
 
 /**
  * @brief 
- * 
  */
 enum JsonValueTypes {
     Object,
@@ -30,7 +38,6 @@ enum JsonValueTypes {
 
 /**
  * @brief 
- * 
  */
 struct JsonValue {
     enum JsonValueTypes value_type;
