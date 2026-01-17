@@ -42,10 +42,10 @@ enum JsonValueTypes {
 struct JsonValue {
     enum JsonValueTypes value_type;
     union {
-        struct JsonObject *object;
-        struct JsonArray *array;
+        struct JsonObject* object;
+        struct JsonArray* array;
         double number;
-        const char *string;
+        const char* string;
         enum JsonLiteralNames literal_name;
     };
 };
@@ -55,14 +55,14 @@ struct JsonValue {
  * 
  * @return struct JsonValue* 
  */
-struct JsonValue *json_value_new();
+struct JsonValue* json_value_new();
 
 /**
  * @brief 
  * 
  * @param json_value 
  */
-void json_value_delete(struct JsonValue *json_value);
+void json_value_delete(struct JsonValue* json_value);
 
 /**
  * @brief 
@@ -70,7 +70,7 @@ void json_value_delete(struct JsonValue *json_value);
  * @param json_value 
  * @return enum JsonValueTypes 
  */
-enum JsonValueTypes json_value_type(struct JsonValue *json_value);
+enum JsonValueTypes json_value_type(struct JsonValue* json_value);
 
 /**
  * @brief 
@@ -78,6 +78,6 @@ enum JsonValueTypes json_value_type(struct JsonValue *json_value);
  * @param json_value 
  * @param file 
  */
-void json_value_print(struct JsonValue *json_value, FILE *file);
+void json_value_print(struct JsonValue* json_value, FILE* file);
 
 #endif // JSON_VALUE_H

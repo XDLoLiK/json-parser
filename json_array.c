@@ -1,8 +1,8 @@
 #include "json_array.h"
 #include "json_value.h"
 
-struct JsonArray *json_array_new() {
-    struct JsonArray *json_array = calloc(1, sizeof(struct JsonArray));
+struct JsonArray* json_array_new() {
+    struct JsonArray* json_array = calloc(1, sizeof(struct JsonArray));
 
     if (!json_array) {
         return NULL;
@@ -20,7 +20,7 @@ struct JsonArray *json_array_new() {
     return json_array;
 }
 
-void json_array_delete(struct JsonArray *json_array) {
+void json_array_delete(struct JsonArray* json_array) {
     free(json_array->data);
     json_array->data = NULL;
     json_array->size = 0;
@@ -28,23 +28,15 @@ void json_array_delete(struct JsonArray *json_array) {
     free(json_array);
 }
 
-static void json_array_reserve(struct JsonArray *json_array, size_t capacity) {
+static void json_array_reserve(struct JsonArray* json_array, size_t capacity) {
     // TODO: check realloc for faulures
-    json_array->data =
-        realloc(json_array->data, capacity * sizeof(struct JsonValue));
+    json_array->data = realloc(json_array->data, capacity*  sizeof(struct JsonValue));
     json_array->capacity = capacity;
 }
 
-void json_array_insert(
-    struct JsonArray *json_array,
-    struct JsonValue *value,
-    size_t position
-) {
+void json_array_insert(struct JsonArray* json_array, struct JsonValue* value, size_t position) {
     if (json_array->size >= json_array->capacity) {
-        json_array_reserve(
-            json_array,
-            json_array->capacity * JSON_ARRAY_GROW_RATE
-        );
+        json_array_reserve(json_array, json_array->capacity * JSON_ARRAY_GROW_RATE);
     }
 
     position = MIN(json_array->size, position);
@@ -53,15 +45,11 @@ void json_array_insert(
         &json_array->data[position],
         json_array->size - position
     );
-    memcpy(
-        &json_array->data[position],
-        value,
-        sizeof(struct JsonValue)
-    );
+    memcpy(&json_array->data[position], value, sizeof(struct JsonValue));
     json_array->size++;
 }
 
-void json_array_erase(struct JsonArray *json_array, size_t position) {
+void json_array_erase(struct JsonArray* json_array, size_t position) {
     position = MIN(json_array->size - 1, position);
     memmove(
         &json_array->data[position],
@@ -71,7 +59,7 @@ void json_array_erase(struct JsonArray *json_array, size_t position) {
     json_array->size--;
 }
 
-struct JsonValue *json_array_at(struct JsonArray *json_array, size_t position) {
+struct JsonValue* json_array_at(struct JsonArray* json_array, size_t position) {
     if (position >= json_array->size) {
         return NULL;
     }
@@ -79,7 +67,7 @@ struct JsonValue *json_array_at(struct JsonArray *json_array, size_t position) {
     return &json_array->data[position];
 }
 
-void json_array_print(struct JsonArray *json_array, FILE *file) {
+void json_array_print(struct JsonArray* json_array, FILE* file) {
     fprintf(file, "[\n");
 
     for (size_t i = 0; i < json_array->size; i++) {

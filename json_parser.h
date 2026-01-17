@@ -40,22 +40,22 @@ enum JsonParserErrorCodes {
 /**
  * @brief 
  */
-struct JsonParserError {
-    enum JsonParserErrorCodes code;
-    const char *message;
-    void (*handler)(void);
+struct JsonParser {
+    const char* file_name;
+    FILE* file;
+    const char* line_start;
+    const char* line_current;
+    size_t line;
+    size_t column;
 };
 
 /**
  * @brief 
  */
-struct JsonParser {
-    const char *file_name;
-    FILE *file;
-    const char *line_start;
-    const char *line_current;
-    size_t line;
-    size_t column;
+struct JsonParserError {
+    enum JsonParserErrorCodes code;
+    const char* message;
+    void (*handler)(struct JsonParser*, const struct JsonParserError*);
 };
 
 /**
@@ -64,14 +64,14 @@ struct JsonParser {
  * @param json_file_name 
  * @return struct JsonParser* 
  */
-struct JsonParser *json_parser_new(const char *json_file_name);
+struct JsonParser* json_parser_new(const char* json_file_name);
 
 /**
  * @brief 
  * 
  * @param json_parser 
  */
-void json_parser_delete(struct JsonParser *json_parser);
+void json_parser_delete(struct JsonParser* json_parser);
 
 /**
  * @brief 
@@ -79,6 +79,6 @@ void json_parser_delete(struct JsonParser *json_parser);
  * @param json_parser 
  * @return struct JsonValue* 
  */
-struct JsonValue *json_parser_get_value(struct JsonParser *json_parser);
+struct JsonValue* json_parser_get_value(struct JsonParser* json_parser);
 
 #endif // JSON_PARSER_H

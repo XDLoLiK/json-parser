@@ -4,52 +4,24 @@
 #include "json_parser.h"
 #include "json_value.h"
 
-extern const char *LITERAL_NAMES[];
+extern const char* LITERAL_NAMES[];
+
+void default_handler(struct JsonParser* json_parser, const struct JsonParserError* error);
+void internal_handler(struct JsonParser* json_parser, const struct JsonParserError* error);
 
 static const struct JsonParserError PARSER_ERRORS[] = {
-    {
-        NoError,
-        "There's no error... Or is there? Why would this be printed otherwise",
-        NULL
-    },
-    {
-        MissingDoubleQuotes,
-        "Expected '\"' JSON string terminating character",
-        NULL
-    },
-    {
-        LiteralNameExpected,
-        "A given token is treated as a JSON literal name, "
-        "therefore there's no existing literal name like that",
-        NULL
-    },
-    {
-        CommentExpected,
-        "Probably you meant to put a '//' JSON comment here",
-        NULL},
-    {
-        LibraryInternal,
-        "Library internal error, you have nothing to do with it :(",
-        NULL
-    },
-    {MissingCurlyBraces, "", NULL},
-    {MissingSquareBraces, "", NULL}
+    { NoError, "No error.", default_handler },
+    { MissingDoubleQuotes, "A '\"' expected.", default_handler },
+    { LiteralNameExpected, "Literal name expected.", default_handler },
+    { CommentExpected, "Comment expected", default_handler },
+    { LibraryInternal, "Library internal error.", internal_handler },
+    { MissingCurlyBraces, "", default_handler },
+    { MissingSquareBraces, "", default_handler }
 };
 
-static struct JsonValue *parse_value(struct JsonParser *json_parser);
+static struct JsonValue* parse_value(struct JsonParser* json_parser);
 
-static void error_report(
-    struct JsonParser *json_parser,
-    enum JsonParserErrorCodes error_code
-) {
-    if (!json_parser || error_code == LibraryInternal) {
-        const struct JsonParserError *internal =
-            &PARSER_ERRORS[LibraryInternal];
-        fprintf(stderr, RED("Error: ") "%s\n", internal->message);
-        exit(LibraryInternal);
-    }
-
-    const struct JsonParserError *error = &PARSER_ERRORS[error_code];
+void default_handler(struct JsonParser* json_parser, const struct JsonParserError* error) {
     fprintf(
         stderr,
         RED("Error: ") "%s\n"
@@ -59,28 +31,44 @@ static void error_report(
         json_parser->column,
         json_parser->line_start
     );
+    exit(error->code);
+}
+
+void internal_handler(
+    __attribute__((unused)) struct JsonParser* json_parser,
+    const struct JsonParserError* error
+) {
+    fprintf(stderr, RED("Error: ") "%s\n", error->message);
+    exit(error->code);
+}
+
+static void error_report(struct JsonParser* json_parser, enum JsonParserErrorCodes error_code) {
+    if (!json_parser) {
+        error_code = LibraryInternal;
+    }
+
+    const struct JsonParserError* error = &PARSER_ERRORS[error_code];
 
     if (!error->handler) {
         exit(error->code);
     }
 
-    error->handler();
+    error->handler(json_parser, error);
 }
 
-static void bump_line(struct JsonParser *json_parser) {
+static void bump_line(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
-    char *line = NULL;
+    char* line = NULL;
     fscanf(json_parser->file, "%m[^\n]\n", &line);
-    free((char *)json_parser->line_start);
+    free((char*)json_parser->line_start);
     json_parser->line_start = line;
     json_parser->line_current = line;
     json_parser->line++;
     json_parser->column = 1;
 }
 
-// returns true if bump_line() was called
-static bool bump_column(struct JsonParser *json_parser, size_t columns) {
+static bool bump_column(struct JsonParser* json_parser, size_t columns) {
     JSON_ASSERT(json_parser);
 
     json_parser->column += columns;
@@ -95,12 +83,12 @@ static bool bump_column(struct JsonParser *json_parser, size_t columns) {
     return false;
 }
 
-struct JsonParser *json_parser_new(const char *json_file_name) {
+struct JsonParser* json_parser_new(const char* json_file_name) {
     if (!json_file_name) {
         return NULL;
     }
 
-    struct JsonParser *json_parser = calloc(1, sizeof(struct JsonParser));
+    struct JsonParser* json_parser = calloc(1, sizeof(struct JsonParser));
 
     if (!json_parser) {
         return NULL;
@@ -132,7 +120,7 @@ struct JsonParser *json_parser_new(const char *json_file_name) {
     return json_parser;
 }
 
-void json_parser_delete(struct JsonParser *json_parser) {
+void json_parser_delete(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     free((char *)json_parser->file_name);
@@ -151,14 +139,14 @@ void json_parser_delete(struct JsonParser *json_parser) {
     free(json_parser);
 }
 
-struct JsonValue *json_parser_get_value(struct JsonParser *json_parser) {
+struct JsonValue* json_parser_get_value(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     return parse_value(json_parser);
 }
 
 static bool require_symbol(
-    struct JsonParser *json_parser,
+    struct JsonParser* json_parser,
     char symbol,
     enum JsonParserErrorCodes error_code
 ) {
@@ -175,13 +163,13 @@ static bool require_symbol(
 }
 
 static bool require_string(
-    struct JsonParser *json_parser,
-    const char *string,
+    struct JsonParser* json_parser,
+    const char* string,
     enum JsonParserErrorCodes error_code
 ) {
     JSON_ASSERT(json_parser);
-    JSON_ASSERT(string);
     JSON_ASSERT(json_parser->line_current);
+    JSON_ASSERT(string);
 
     size_t line_length = strlen(json_parser->line_current);
     size_t string_length = strlen(string);
@@ -197,7 +185,7 @@ static bool require_string(
     return true;
 }
 
-static void skip_spaces(struct JsonParser *json_parser) {
+static void skip_spaces(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     while (isspace(*json_parser->line_current)) {
@@ -205,17 +193,15 @@ static void skip_spaces(struct JsonParser *json_parser) {
     }
 }
 
-static void skip_comment(struct JsonParser *json_parser) {
+static void skip_comment(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     require_string(json_parser, "//", CommentExpected);
 
-    while (!bump_column(json_parser, 1)) {
-        ;
-    }
+    while (!bump_column(json_parser, 1)) { }
 }
 
-static double parse_number(struct JsonParser *json_parser) {
+static double parse_number(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     double json_number = 0;
@@ -225,30 +211,29 @@ static double parse_number(struct JsonParser *json_parser) {
     return json_number;
 }
 
-static struct JsonObject *parse_object(struct JsonParser *json_parser) {
+static struct JsonObject* parse_object(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
     
-    require_symbol(json_parser, '{', );
-    struct JsonObject *json_object = json_object_new();
+    require_symbol(json_parser, '{', MissingCurlyBraces);
+    struct JsonObject* json_object = json_object_new();
     return json_object;
 }
 
-static struct JsonArray *parse_array(struct JsonParser *json_parser) {
+static struct JsonArray* parse_array(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
-    require_symbol(json_parser, '[', );
-    struct JsonArray *json_array = json_array_new();
+    require_symbol(json_parser, '[', MissingSquareBraces);
+    struct JsonArray* json_array = json_array_new();
     return json_array;
 }
 
-static const char *parse_string(struct JsonParser *json_parser) {
+static const char* parse_string(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     require_symbol(json_parser, '\"', MissingDoubleQuotes);
-    char *json_string = NULL;
+    char* json_string = NULL;
     int count = 0;
-    int scanned =
-        sscanf(json_parser->line_current, "%m[^\"]%n", &json_string, &count);
+    int scanned = sscanf(json_parser->line_current, "%m[^\"]%n", &json_string, &count);
 
     if (scanned < 1) {
         error_report(json_parser, MissingDoubleQuotes);
@@ -260,9 +245,7 @@ static const char *parse_string(struct JsonParser *json_parser) {
     return json_string;
 }
 
-static enum JsonLiteralNames parse_literal_name(
-    struct JsonParser *json_parser
-) {
+static enum JsonLiteralNames parse_literal_name(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
     size_t line_length = strlen(json_parser->line_current);
@@ -274,13 +257,7 @@ static enum JsonLiteralNames parse_literal_name(
             continue;
         }
 
-        if (strncmp(
-                json_parser->line_current,
-                LITERAL_NAMES[i],
-                literal_name_length
-            )
-            == 0)
-        {
+        if (strncmp(json_parser->line_current, LITERAL_NAMES[i], literal_name_length) == 0) {
             bump_column(json_parser, literal_name_length);
             return i;
         }
@@ -290,10 +267,10 @@ static enum JsonLiteralNames parse_literal_name(
     return LiteralNameMax;
 }
 
-static struct JsonValue *parse_value(struct JsonParser *json_parser) {
+static struct JsonValue* parse_value(struct JsonParser* json_parser) {
     JSON_ASSERT(json_parser);
 
-    struct JsonValue *json_value = json_value_new();
+    struct JsonValue* json_value = json_value_new();
     json_value->value_type = ValueTypeMax;
 
 retry:

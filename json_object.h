@@ -18,8 +18,8 @@
  * @brief 
  */
 struct JsonObjectEntry {
-    const char *key;
-    struct JsonValue *value;
+    const char* key;
+    struct JsonValue* value;
 };
 
 /**
@@ -36,14 +36,14 @@ struct JsonObject {
  * 
  * @return struct JsonObject* 
  */
-struct JsonObject *json_object_new();
+struct JsonObject* json_object_new();
 
 /**
  * @brief 
  * 
  * @param json_object 
  */
-void json_object_delete(struct JsonObject *json_object);
+void json_object_delete(struct JsonObject* json_object);
 
 /**
  * @brief 
@@ -52,11 +52,7 @@ void json_object_delete(struct JsonObject *json_object);
  * @param key 
  * @param value 
  */
-void json_object_insert(
-    struct JsonObject *json_object,
-    const char *key,
-    struct JsonValue *value
-);
+void json_object_insert(struct JsonObject* json_object, const char* key, struct JsonValue* value);
 
 /**
  * @brief 
@@ -64,7 +60,7 @@ void json_object_insert(
  * @param json_object 
  * @param key 
  */
-void json_object_erase(struct JsonObject *json_object, const char *key);
+void json_object_erase(struct JsonObject* json_object, const char* key);
 
 /**
  * @brief 
@@ -73,10 +69,7 @@ void json_object_erase(struct JsonObject *json_object, const char *key);
  * @param key 
  * @return struct JsonObjectEntry* 
  */
-struct JsonObjectEntry *json_object_get(
-    struct JsonObject *json_object,
-    const char *key
-);
+struct JsonObjectEntry* json_object_get(struct JsonObject* json_object, const char* key);
 
 /**
  * @brief 
@@ -84,7 +77,7 @@ struct JsonObjectEntry *json_object_get(
  * @param json_object 
  * @return size_t 
  */
-size_t json_object_size(struct JsonObject *json_object);
+size_t json_object_size(struct JsonObject* json_object);
 
 /**
  * @brief 
@@ -92,6 +85,6 @@ size_t json_object_size(struct JsonObject *json_object);
  * @param json_object 
  * @param file 
  */
-void json_object_print(struct JsonObject *json_object, FILE *file);
+void json_object_print(struct JsonObject* json_object, FILE* file);
 
 #endif // JSON_OBJECT_H

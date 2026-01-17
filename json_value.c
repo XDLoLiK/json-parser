@@ -2,18 +2,18 @@
 #include "json_object.h"
 #include "json_value.h"
 
-const char *LITERAL_NAMES[] = {
+const char* LITERAL_NAMES[] = {
     "false",
     "null",
     "true",
 };
 
-struct JsonValue *json_value_new() {
-    struct JsonValue *json_value = calloc(1, sizeof(struct JsonValue));
+struct JsonValue* json_value_new() {
+    struct JsonValue* json_value = calloc(1, sizeof(struct JsonValue));
     return json_value;
 }
 
-void json_value_delete(struct JsonValue *json_value) {
+void json_value_delete(struct JsonValue* json_value) {
     switch (json_value->value_type) {
         case Object: {
             json_object_delete(json_value->object);
@@ -35,11 +35,11 @@ void json_value_delete(struct JsonValue *json_value) {
     free(json_value);
 }
 
-enum JsonValueTypes json_value_type(struct JsonValue *json_value) {
+enum JsonValueTypes json_value_type(struct JsonValue* json_value) {
     return json_value->value_type;
 }
 
-void json_value_print(struct JsonValue *json_value, FILE *file) {
+void json_value_print(struct JsonValue* json_value, FILE* file) {
     switch (json_value->value_type) {
         case Object: {
             json_object_print(json_value->object, file);
